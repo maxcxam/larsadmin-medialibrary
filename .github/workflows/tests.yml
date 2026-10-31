@@ -1,0 +1,163 @@
+name: tests
+
+# CI of the published package (design 1.0 §5.5, ADR-045). It runs in github.com/maxcxam/larsadmin-medialibrary, the
+# split of packages/larsadmin-medialibrary: composer.json there has no path repository, so maxcxam/larsadmin
+# (^1.6) comes from Packagist, exactly as for a user. No composer.lock is committed: every job resolves fresh.
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        # PHP 8.3 -> Pest 4 (Pest 5 needs PHP ^8.4); Laravel 12.* -> orchestra/testbench 10, 13.* -> testbench 11.
+        # The framework pin is a temporary constraint (`composer update --with`), so composer.json stays
+        # untouched and tests/ComposerManifestTest.php keeps comparing the committed manifests.
+        php: ['8.3', '8.4', '8.5']
+        laravel: ['12.*', '13.*']
+        dependencies: ['highest']
+        include:
+          # Coverage runs in exactly one cell (pcov, fails below 90% line coverage).
+          - php: '8.4'
+            laravel: '13.*'
+            dependencies: 'highest'
+            coverage: true
+          # Lowest versions the constraints allow (maxcxam/larsadmin 1.6.0, spatie/laravel-medialibrary 11.23.0, ...).
+          # A different `dependencies` value makes this a new (7th) cell instead of merging into 8.3 / 12.*.
+          - php: '8.3'
+            laravel: '12.*'
+            dependencies: 'lowest'
+
+    name: PHP ${{ matrix.php }} / Laravel ${{ matrix.laravel }}${{ matrix.dependencies == 'lowest' && ' / prefer-lowest' || '' }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: gd, exif, fileinfo
+          coverage: ${{ matrix.coverage && 'pcov' || 'none' }}
+
+      - name: Install dependencies
+        run: >-
+          composer update --prefer-dist --no-interaction --no-progress --with-all-dependencies
+          --with "laravel/framework:${{ matrix.laravel }}"
+          ${{ matrix.dependencies == 'lowest' && '--prefer-lowest --prefer-stable' || '' }}
+
+      - name: Show the resolved core and medialibrary versions
+        run: composer show maxcxam/larsadmin spatie/laravel-medialibrary laravel/framework | grep -E '^(name|versions)'
+
+      # imageavif() exists only when GD is built with libavif (the PHP builds setup-php installs on ubuntu are).
+      # Tests must not depend on it; this only makes a build without it visible in the log.
+      - name: Report GD AVIF support
+        run: |
+          php -r 'echo function_exists("imageavif") ? "GD: AVIF supported\n" : "::warning::GD without AVIF support (imageavif() missing)\n";'
+
+      - name: Run tests
+        if: ${{ !matrix.coverage }}
+        run: vendor/bin/pest
+
+      # Measured 2026-10-31 (xdebug, PHP 8.4, Laravel 13, suite mid-review): 91.6% of lines. Re-measure on the
+      # final suite before the tag (php -d zend_extension=xdebug -d xdebug.mode=coverage vendor/bin/pest --coverage).
+      - name: Run tests with coverage (min 90%)
+        if: ${{ matrix.coverage }}
+        run: vendor/bin/pest --coverage --min=90
+
+  style:
+    runs-on: ubuntu-latest
+
+    name: Code style (Pint)
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          coverage: none
+
+      - name: Install dependencies
+        run: composer update --prefer-dist --no-interaction --no-progress
+
+      # pint.json: the laravel preset, as the core (which has no pint.json of its own).
+      - name: Check code style
+        run: vendor/bin/pint --test
+
+  frontend:
+    runs-on: ubuntu-latest
+
+    name: Frontend (Node 22)
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # vite.config.js loads the larsadmin kit (Vite preset, test helpers, theme) from vendor/maxcxam/larsadmin/kit.
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          coverage: none
+
+      # Deterministic dist/ check (review CRM-10): build against one exact core release, not whatever 1.x
+      # Packagist serves today, so a later core release that changes the kit preset or theme.css cannot turn this
+      # job red without a change here. The pin is the lowest supported core (the ^1.6 floor in composer.json):
+      # dist/ must work with it anyway. Its kit (vite.js, theme.css, testing.js) is byte-identical to 1.6.1 and to
+      # the monorepo core at the time of pinning, so a local `npm run build` in the monorepo produces the same dist/.
+      # When the kit changes in the core, or the floor is raised: bump KIT_LARSADMIN and rebuild dist/.
+      - name: Install the larsadmin kit (Composer, pinned)
+        env:
+          KIT_LARSADMIN: '1.6.0'
+        run: >-
+          composer update --prefer-dist --no-interaction --no-progress --no-dev --with-all-dependencies
+          --with "maxcxam/larsadmin:${KIT_LARSADMIN}"
+
+      - name: Show the kit version
+        run: composer show maxcxam/larsadmin | grep -E '^versions'
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Unit tests
+        run: npm test
+
+      - name: Build
+        run: npm run build
+
+      - name: Check that dist/ is up to date
+        run: git diff --exit-code dist
+
+  public-api:
+    runs-on: ubuntu-latest
+
+    name: Public extension API
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          coverage: none
+
+      - name: Install dependencies
+        run: composer update --prefer-dist --no-interaction --no-progress --no-dev
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      # The add-on may use only the public extension API of the installed core (ADR-034): the snapshot
+      # kit/public-api.json that ships with maxcxam/larsadmin is the contract of that version.
+      - name: Check the public extension API
+        run: node vendor/maxcxam/larsadmin/kit/check-public-api.mjs .

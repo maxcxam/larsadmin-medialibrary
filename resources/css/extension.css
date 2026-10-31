@@ -1,0 +1,5 @@
+/* source(none): Tailwind scans only the component sources, not the README, docs, skill or tests (a deterministic dist/). */
+@import "tailwindcss/utilities" source(none);
+@import "larsadmin-kit/theme.css";
+
+@source "../js";

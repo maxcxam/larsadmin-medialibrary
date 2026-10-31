@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
+         bootstrap="vendor/autoload.php"
+         colors="true"
+         cacheDirectory=".phpunit.cache">
+    <testsuites>
+        <!-- Run one suite with its name (Unit, Feature or Ai) as the pest testsuite option. The wildcard paths keep PHPUnit from
+             aborting when a suite directory does not exist (yet): a missing plain directory is a fatal error. -->
+        <testsuite name="Unit">
+            <directory>tests/Unit*</directory>
+            <!-- tests/ComposerManifestTest.php (a file entry is ignored by Pest, a suffix-filtered directory is not) -->
+            <directory suffix="ComposerManifestTest.php">tests</directory>
+        </testsuite>
+        <testsuite name="Feature">
+            <directory>tests/Feature</directory>
+        </testsuite>
+        <testsuite name="Ai">
+            <directory>tests/Ai*</directory>
+        </testsuite>
+    </testsuites>
+    <source>
+        <include>
+            <directory>src</directory>
+        </include>
+    </source>
+    <php>
+        <env name="APP_ENV" value="testing"/>
+        <env name="DB_CONNECTION" value="sqlite"/>
+        <env name="DB_DATABASE" value=":memory:"/>
+        <env name="BCRYPT_ROUNDS" value="4"/>
+    </php>
+</phpunit>

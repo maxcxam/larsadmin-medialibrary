@@ -1,0 +1,11 @@
+/vendor
+/node_modules
+/.phpunit.cache
+/.phpunit.result.cache
+# Lock files are not committed (a library): composer.lock from composer.json (standalone / CI) and
+# composer.monorepo.lock from composer.monorepo.json (monorepo development, design 1.0 §5.2).
+/composer.lock
+/composer.monorepo.lock
+/.idea
+/.vscode
+.DS_Store
