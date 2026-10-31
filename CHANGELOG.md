@@ -6,6 +6,13 @@
 версіонування на [Semantic Versioning](https://semver.org/lang/uk/). Версії доповнення незалежні від версій ядра
 `maxcxam/larsadmin`.
 
+## [1.0.1] - 2026-10-31
+
+### Fixed
+
+- CI: крок, що друкує встановлені версії залежностей, викликав `composer show` з кількома пакетами (Composer приймає
+  один), тож тести 1.0.0 у CI не запускались. Код пакета не змінювався.
+
 ## [1.0.0] - 2026-10-31
 
 Перший реліз. Потребує `maxcxam/larsadmin` `^1.6`, `spatie/laravel-medialibrary` `^11.23`, PHP 8.3–8.5,
@@ -92,4 +99,5 @@ Laravel 12 або 13. Хосту не потрібен npm: зібрані фа�
 - Перетворення, зареєстровані умовно (залежно від медіа), не звіряються з `conversion()`.
 - MCP-інструменти ядра (`describe-entity`, `search-docs`) не знають доповнення — заплановано в ядрі 1.7.
 
+[1.0.1]: https://github.com/maxcxam/larsadmin-medialibrary/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/maxcxam/larsadmin-medialibrary/releases/tag/v1.0.0
