@@ -51,7 +51,7 @@ jobs:
           ${{ matrix.dependencies == 'lowest' && '--prefer-lowest --prefer-stable' || '' }}
 
       - name: Show the resolved core and medialibrary versions
-        run: composer show maxcxam/larsadmin spatie/laravel-medialibrary laravel/framework | grep -E '^(name|versions)'
+        run: composer show | grep -E '^(maxcxam/larsadmin|spatie/laravel-medialibrary|laravel/framework) '
 
       # imageavif() exists only when GD is built with libavif (the PHP builds setup-php installs on ubuntu are).
       # Tests must not depend on it; this only makes a build without it visible in the log.
