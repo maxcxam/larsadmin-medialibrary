@@ -14,6 +14,8 @@ use Maxcxam\LarsadminMedialibrary\MedialibraryServiceProvider;
 use Maxcxam\LarsadminMedialibrary\Tests\Fixtures\Article;
 use Maxcxam\LarsadminMedialibrary\Tests\Fixtures\ArticlePolicy;
 use Maxcxam\LarsadminMedialibrary\Tests\Fixtures\Entities\Articles;
+use Maxcxam\LarsadminMedialibrary\Tests\Fixtures\Post;
+use Maxcxam\LarsadminMedialibrary\Tests\Fixtures\PostPolicy;
 use Maxcxam\LarsadminMedialibrary\Tests\Fixtures\User;
 use Orchestra\Testbench\TestCase as Orchestra;
 use Spatie\MediaLibrary\MediaLibraryServiceProvider as SpatieMediaLibraryServiceProvider;
@@ -32,6 +34,7 @@ abstract class TestCase extends Orchestra
         Larsadmin::flushState();
         ArticlePolicy::reset();
         Article::$queueThumbs = false;
+        Post::$queueThumbs = false;
         Articles::$contractVisible = true;
 
         parent::setUp();
@@ -41,6 +44,7 @@ abstract class TestCase extends Orchestra
 
         Larsadmin::auth(fn () => true);
         Gate::policy(Article::class, ArticlePolicy::class);
+        Gate::policy(Post::class, PostPolicy::class);
 
         $this->admin = User::create(['name' => 'Admin', 'email' => 'admin@example.com', 'password' => 'secret']);
     }
@@ -86,6 +90,13 @@ abstract class TestCase extends Orchestra
             $table->id();
             $table->string('title');
             $table->timestamps();
+        });
+
+        Schema::create('posts', function (Blueprint $table) {
+            $table->id();
+            $table->string('title');
+            $table->timestamps();
+            $table->softDeletes();
         });
     }
 }

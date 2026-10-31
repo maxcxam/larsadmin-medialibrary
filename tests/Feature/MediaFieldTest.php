@@ -36,7 +36,7 @@ it('serializes as a multipart extension field with the form payload', function (
         'maxFiles' => 3,
         'value' => ['present' => 1, 'known' => $ids, 'keep' => $ids],
         'displayedAs' => 'a.jpg, b.jpg',
-        'accept' => '.jpg,.jpeg,.png,.gif,.webp,.avif',
+        'accept' => '.jpg,.jpeg,.png,.gif,.webp',
     ])->and($json)->not->toHaveKey('files')
         ->and(array_column($json['media'], 'name'))->toBe(['a.jpg', 'b.jpg'])
         ->and($json['media'][0]['isImage'])->toBeTrue();

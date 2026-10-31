@@ -21,7 +21,9 @@ use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
  * Extension routes ({path}/ext/medialibrary/...). The panel gate is applied by Larsadmin::routes(); everything
  * else here: the record through Larsadmin::findRecord() (viewAny → detail scope → policy), the field through
  * Larsadmin::findField() (visibility, read-only), then the media's membership in the field's collection.
- * Changes run through Larsadmin::audited(), so they are in the audit log like form saves.
+ * Changes run through Larsadmin::audited(), so they are in the audit log like form saves (ADR-043).
+ *
+ * @internal
  */
 class MediaController
 {

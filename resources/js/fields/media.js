@@ -134,3 +134,16 @@ export function isExpired(field, now = Date.now(), skew = 5000) {
 
     return Number.isFinite(at) && at - skew <= now
 }
+
+// A queued preview conversion that is not generated yet (design §4: until then the preview is the original or an icon).
+// `previewPending` is optional in the item props; without it the item is treated as ready.
+export function isPreviewPending(item) {
+    return item?.previewPending === true
+}
+
+// The current URL (`key`: 'url' | 'downloadUrl') of a media item in freshly reloaded props, or null if it is gone.
+export function currentUrl(media, id, key) {
+    const item = (Array.isArray(media) ? media : []).find((other) => other.id === id)
+
+    return item?.[key] ?? null
+}

@@ -22,5 +22,6 @@ return [
     'remove_confirm' => 'Delete :name now? This cannot be undone.',
     'removed' => ':name deleted',
     'reordered' => 'Order saved',
+    'preview_pending' => 'Generating preview…',
     'failed' => 'The change was not saved',
 ];

@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { mountField } from 'larsadmin-kit/testing.js'
 import MediaInput from './MediaInput.vue'
 
-const translations = { 'larsadmin-medialibrary': { remove: 'Remove :name', undo: 'Undo :name', move_up: 'Up :name', move_down: 'Down :name', new: 'New', none: 'None' } }
+const translations = { 'larsadmin-medialibrary': { remove: 'Remove :name', undo: 'Undo :name', move_up: 'Up :name', move_down: 'Down :name', new: 'New', none: 'None', preview_pending: 'Generating preview' } }
 
 const gallery = {
     attribute: 'gallery',
@@ -65,6 +65,17 @@ describe('MediaInput', () => {
 
         expect(last(wrapper).upload).toEqual([ok])
         expect(wrapper.find('[role="alert"]').exists()).toBe(true)
+    })
+
+    it('marks stored media whose preview is still being generated and survives a broken thumbnail', async () => {
+        const wrapper = mount({ ...gallery, media: [{ ...gallery.media[0], previewPending: true }, gallery.media[1]] })
+
+        expect(wrapper.findAll('[data-preview-pending]')).toHaveLength(1)
+
+        await wrapper.find('img[src="/t/2"]').trigger('error')
+
+        expect(wrapper.find('img[src="/t/2"]').exists()).toBe(false)
+        expect(wrapper.findAll('img')).toHaveLength(1)
     })
 
     it('has no controls when readonly', () => {

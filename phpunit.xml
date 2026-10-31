@@ -5,8 +5,18 @@
          colors="true"
          cacheDirectory=".phpunit.cache">
     <testsuites>
-        <testsuite name="LarsadminMedialibrary">
-            <directory>tests</directory>
+        <!-- Run one suite with its name (Unit, Feature or Ai) as the pest testsuite option. The wildcard paths keep PHPUnit from
+             aborting when a suite directory does not exist (yet): a missing plain directory is a fatal error. -->
+        <testsuite name="Unit">
+            <directory>tests/Unit*</directory>
+            <!-- tests/ComposerManifestTest.php (a file entry is ignored by Pest, a suffix-filtered directory is not) -->
+            <directory suffix="ComposerManifestTest.php">tests</directory>
+        </testsuite>
+        <testsuite name="Feature">
+            <directory>tests/Feature</directory>
+        </testsuite>
+        <testsuite name="Ai">
+            <directory>tests/Ai*</directory>
         </testsuite>
     </testsuites>
     <source>

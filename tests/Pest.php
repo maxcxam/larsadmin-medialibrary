@@ -5,6 +5,7 @@ use Maxcxam\Larsadmin\Larsadmin;
 use Maxcxam\Larsadmin\Testing\InteractsWithLarsadmin;
 use Maxcxam\LarsadminMedialibrary\Tests\Fixtures\Article;
 use Maxcxam\LarsadminMedialibrary\Tests\Fixtures\Entities\Articles;
+use Maxcxam\LarsadminMedialibrary\Tests\Fixtures\Post;
 use Maxcxam\LarsadminMedialibrary\Tests\TestCase;
 
 pest()->extend(TestCase::class)->use(InteractsWithLarsadmin::class)->in(__DIR__);
@@ -34,7 +35,7 @@ function registerArticles(string ...$entities): void
 }
 
 /** @return array<int, int> media ids of the collection in order */
-function mediaIds(Article $article, string $collection): array
+function mediaIds(Article|Post $article, string $collection): array
 {
     return $article->fresh()->getMedia($collection)->map(fn ($media) => (int) $media->getKey())->all();
 }
@@ -57,4 +58,36 @@ function recordAbilities(?Article $record): array
         'update' => $entity->authorizedToUpdate(request()),
         'delete' => $entity->authorizedToDelete(request()),
     ];
+}
+
+/** A post with media added directly through medialibrary (the collections' own disks). */
+function postWith(array $media = [], string $title = 'Post', string $class = Post::class): Post
+{
+    $post = $class::create(['title' => $title]);
+
+    foreach ($media as $collection => $files) {
+        foreach ((array) $files as $file) {
+            $post->addMedia($file)->toMediaCollection($collection);
+        }
+    }
+
+    return $post->fresh();
+}
+
+/** A small plain-text upload whose content type (finfo) is text/plain. */
+function textFile(string $name = 'notes.txt'): UploadedFile
+{
+    return UploadedFile::fake()->createWithContent($name, 'Plain text notes
+line two
+');
+}
+
+/** A minimal one-page PDF whose content type (finfo) is application/pdf. */
+function pdfFile(string $name = 'doc.pdf'): UploadedFile
+{
+    return UploadedFile::fake()->createWithContent($name, '%PDF-1.4
+1 0 obj<</Type/Catalog>>endobj
+trailer<</Root 1 0 R>>
+%%EOF
+');
 }

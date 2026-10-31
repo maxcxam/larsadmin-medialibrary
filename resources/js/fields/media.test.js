@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { addUploads, extensionOf, formatSize, initialPayload, isExpired, move, normalize, otherErrors, precheck, removeUpload, toggleKeep, uploadErrors } from './media'
+import { addUploads, currentUrl, extensionOf, formatSize, initialPayload, isExpired, isPreviewPending, move, normalize, otherErrors, precheck, removeUpload, toggleKeep, uploadErrors } from './media'
 
 const gallery = { multiple: true, maxFiles: 3, maxSize: 1024, types: ['jpg', 'png'], value: { present: 1, known: [1, 2], keep: [1, 2] } }
 const file = (name, size = 10) => ({ name, size, type: 'image/jpeg' })
@@ -75,4 +75,20 @@ describe('errorsByKey', () => {
     it('lists the other nested messages, without the field-level ones the panel shows', () => {
         expect(otherErrors(bag, 'gallery')).toEqual(['invalid id', 'odd key'])
     })
+})
+
+it('treats only an explicit previewPending flag as pending', () => {
+    expect(isPreviewPending({ previewPending: true })).toBe(true)
+    expect(isPreviewPending({ previewPending: 1 })).toBe(false)
+    expect(isPreviewPending({})).toBe(false)
+    expect(isPreviewPending(null)).toBe(false)
+})
+
+it('finds the current URL of a media item in reloaded props', () => {
+    const media = [{ id: 1, url: '/new/1', downloadUrl: '/new/d1' }]
+
+    expect(currentUrl(media, 1, 'url')).toBe('/new/1')
+    expect(currentUrl(media, 1, 'downloadUrl')).toBe('/new/d1')
+    expect(currentUrl(media, 2, 'url')).toBe(null)
+    expect(currentUrl(undefined, 1, 'url')).toBe(null)
 })

@@ -10,6 +10,8 @@ use Maxcxam\LarsadminMedialibrary\Http\MediaController;
 /**
  * Registers the extension (built files in dist/, translations) and its routes. Only the public extension API of
  * larsadmin is used (design 1.5 §4.1): Larsadmin::extension(), Larsadmin::routes().
+ *
+ * @internal Auto-discovered (extra.laravel.providers); hosts do not reference it.
  */
 class MedialibraryServiceProvider extends ServiceProvider
 {

@@ -14,6 +14,8 @@ use Maxcxam\LarsadminMedialibrary\MedialibraryServiceProvider;
 /**
  * Implicit rule on {attr}: runs when the key is absent. Required → the final set is not empty; multiple → the
  * final count is at most maxFiles. The final set is computed exactly as fill() does (Media::plan()).
+ *
+ * @internal
  */
 class MediaFieldState implements DataAwareRule, ValidationRule
 {
@@ -37,13 +39,13 @@ class MediaFieldState implements DataAwareRule, ValidationRule
 
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
-        $record = $this->record ?? $this->field->entityClass()::newModel();
-
         if ($value !== null && ! is_array($value)) {
             return; // the "array" rule reports it
         }
 
-        $current = $this->field->currentMedia($record)->count();
+        // No record and no bound entity (a field used outside a panel without a record): nothing is stored yet.
+        $record = $this->record;
+        $current = $record !== null ? $this->field->currentMedia($record)->count() : 0;
 
         if ($value === null) {
             $final = $current;
@@ -51,8 +53,8 @@ class MediaFieldState implements DataAwareRule, ValidationRule
             $request = Request::create('/', 'POST', [$attribute => array_diff_key($value, ['upload' => true])]);
             $uploads = array_filter((array) ($value['upload'] ?? []), fn ($file) => $file instanceof UploadedFile);
             $request->files->set($attribute, ['upload' => array_values($uploads)]);
-            $plan = $this->field->plan($request, $record);
-            $final = count($plan['keep']) + count($plan['uploads']);
+            $plan = $record !== null ? $this->field->plan($request, $record) : null;
+            $final = $plan !== null ? count($plan['keep']) + count($plan['uploads']) : ($this->field->isMultiple() ? count($uploads) : min(1, count($uploads)));
         }
 
         if ($this->required && $final === 0) {

@@ -23,7 +23,7 @@ class Article extends Model implements HasMedia
     {
         $this->addMediaCollection('cover')->singleFile();
         $this->addMediaCollection('gallery');
-        $this->addMediaCollection('contract');
+        $this->addMediaCollection('contract')->singleFile();
     }
 
     public function registerMediaConversions(?Media $media = null): void

@@ -3,7 +3,7 @@
 // label, help and the first error; this component draws the control and the per-file list.
 import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import { Icon, useI18n } from 'larsadmin'
-import { addUploads, formatSize, move, normalize, otherErrors, precheck, removeUpload, toggleKeep, uploadErrors } from './media'
+import { addUploads, formatSize, isPreviewPending, move, normalize, otherErrors, precheck, removeUpload, toggleKeep, uploadErrors } from './media'
 
 const props = defineProps({
     field: { type: Object, required: true },
@@ -35,6 +35,11 @@ const readonly = computed(() => !!props.field.readonly)
 const replacing = computed(() => !props.field.multiple && payload.value.upload.length > 0)
 const perUpload = computed(() => uploadErrors(props.errorsByKey, props.field.attribute))
 const nested = computed(() => otherErrors(props.errorsByKey, props.field.attribute))
+
+// Stored thumbnails that failed to load fall back to the file icon.
+const broken = ref(new Set())
+const thumbnail = (item) => (item.isImage && item.thumbnailUrl && !broken.value.has(item.id) ? item.thumbnailUrl : null)
+const markBroken = (item) => (broken.value = new Set(broken.value).add(item.id))
 
 // Object URLs of pending image uploads, revoked when the file leaves the list or the component unmounts.
 const previews = new Map()
@@ -98,9 +103,10 @@ const limits = computed(() => {
     <div class="rounded-md border border-default bg-canvas" :class="{ 'border-danger-fg': invalid }">
         <ul v-if="kept.length || removed.length || payload.upload.length" class="divide-y divide-muted">
             <li v-for="(item, index) in kept" :key="`m${item.id}`" class="flex items-center gap-3 px-3 py-2" :class="{ 'opacity-50': replacing }">
-                <img v-if="item.isImage && item.thumbnailUrl" :src="item.thumbnailUrl" :alt="ns('preview_alt', { name: item.name })" width="40" height="40" loading="lazy" decoding="async" class="size-10 rounded object-cover" />
+                <img v-if="thumbnail(item)" :src="thumbnail(item)" :alt="ns('preview_alt', { name: item.name })" width="40" height="40" loading="lazy" decoding="async" class="size-10 rounded object-cover" @error="markBroken(item)" />
                 <Icon v-else name="file" class="size-4 text-fg-muted" />
                 <span class="min-w-0 flex-1 truncate text-sm text-fg" :class="{ 'line-through': replacing }">{{ item.name }}</span>
+                <span v-if="isPreviewPending(item)" class="text-xs text-fg-muted" data-preview-pending>{{ ns('preview_pending') }}</span>
                 <span class="text-xs text-fg-muted">{{ formatSize(item.size, locale) }}</span>
                 <template v-if="!readonly && field.multiple">
                     <button type="button" class="larsadmin-btn larsadmin-btn-sm" :disabled="index === 0" :aria-label="ns('move_up', { name: item.name })" @click="update(move(payload, item.id, -1))">
