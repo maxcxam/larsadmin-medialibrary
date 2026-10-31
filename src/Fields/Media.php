@@ -17,10 +17,10 @@ use LogicException;
 use Maxcxam\Larsadmin\Entity;
 use Maxcxam\Larsadmin\Fields\Field;
 use Maxcxam\Larsadmin\Files\FileJournal;
+use Maxcxam\Larsadmin\Files\FileSafety;
 use Maxcxam\Larsadmin\Larsadmin;
 use Maxcxam\LarsadminMedialibrary\MedialibraryServiceProvider;
 use Maxcxam\LarsadminMedialibrary\Rules\MediaFieldState;
-use Maxcxam\LarsadminMedialibrary\Support\FileSafety;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media as MediaModel;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
@@ -265,12 +265,11 @@ class Media extends Field
 
         $this->displayedAs = $items->map(fn (MediaModel $media) => $this->displayName($media))->implode(', ');
 
-        // SPIKE GAP (A4, deferred to 1.6): a field gets no per-record rights from the panel, so it asks the
-        // entity's policy itself (one or two policy calls per resolved record).
-        $instance = $this->entity !== null ? $this->entity::make($record) : null;
-        $viewable = $instance?->authorizedToView($request) ?? false;
-        $manageable = $this->context === self::DETAIL && $instance !== null && ! $this->readonly
-            && $instance->authorizedToUpdate($request)
+        // The per-record rights the panel already computed for the row (Field::authorizedTo(), 1.6): no policy
+        // calls here; false outside an entity (fail closed).
+        $viewable = $this->entity !== null && $this->authorizedTo('view');
+        $manageable = $this->context === self::DETAIL && $this->entity !== null && ! $this->readonly
+            && $this->authorizedTo('update')
             && $this->editableOn($request, $record);
 
         $routeParams = $this->routeParameters($record);
@@ -282,7 +281,7 @@ class Media extends Field
         }
 
         $this->media = $items->map(function (MediaModel $media) use ($viewable, $manageable, $routeParams, $expires, &$expiring) {
-            $isImage = FileSafety::isRasterMime($media->mime_type) && FileSafety::isRasterFile($media->file_name);
+            $isImage = FileSafety::isRasterImage($media->file_name, (string) $media->mime_type);
             $urls = $viewable && $routeParams !== null ? $this->urlsFor($media, $routeParams, $expires, $isImage) : null;
             $expiring = $expiring || ($urls['expiring'] ?? false);
 

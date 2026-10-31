@@ -192,12 +192,12 @@ it('shows the original as the preview until a queued conversion ran', function (
     $field = MediaGallery::make('Gallery', 'gallery')->conversion('thumb');
 
     expect($media->hasGeneratedConversion('thumb'))->toBeFalse()
-        ->and($this->serializeField($field, $article, entity: Articles::class)['media'][0]['thumbnailUrl'])->not->toContain('conversion=thumb');
+        ->and($this->serializeField($field, $article, entity: Articles::class, abilities: recordAbilities($article))['media'][0]['thumbnailUrl'])->not->toContain('conversion=thumb');
 
     Queue::assertPushed(PerformConversionsJob::class);
     Queue::pushed(PerformConversionsJob::class)->each(fn ($job) => app()->call([$job, 'handle']));
 
-    expect($this->serializeField($field, $article->fresh(), entity: Articles::class)['media'][0]['thumbnailUrl'])->toContain('conversion=thumb');
+    expect($this->serializeField($field, $article->fresh(), entity: Articles::class, abilities: recordAbilities($article))['media'][0]['thumbnailUrl'])->toContain('conversion=thumb');
 });
 
 describe('audit log (1.3)', function () {

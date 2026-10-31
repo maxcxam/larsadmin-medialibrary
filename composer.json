@@ -16,14 +16,14 @@
             "options": {
                 "symlink": true,
                 "versions": {
-                    "maxcxam/larsadmin": "1.5.0"
+                    "maxcxam/larsadmin": "1.x-dev"
                 }
             }
         }
     ],
     "require": {
         "php": "^8.3",
-        "maxcxam/larsadmin": "^1.5",
+        "maxcxam/larsadmin": "^1.6",
         "spatie/laravel-medialibrary": "^11.23"
     },
     "require-dev": {

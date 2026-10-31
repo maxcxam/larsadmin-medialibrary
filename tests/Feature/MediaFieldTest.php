@@ -17,10 +17,10 @@ beforeEach(function () {
     $this->actingAs($this->admin);
 });
 
-/** Serialized as the panel does, bound to its entity (serializeField(..., $entity), ADR-035). */
+/** Serialized as the panel does, bound to its entity (serializeField(..., $entity), ADR-035) with the record's abilities. */
 function serialized(Media $field, ?Article $record, string $context = Field::DETAIL): array
 {
-    return test()->serializeField($field, $record, $context, Articles::class);
+    return test()->serializeField($field, $record, $context, Articles::class, recordAbilities($record));
 }
 
 it('serializes as a multipart extension field with the form payload', function () {

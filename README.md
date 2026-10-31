@@ -36,7 +36,8 @@ npm install && npm test && npm run build
 ```
 
 API gaps: `docs/reviews/2026-10-31-1.5-medialibrary-spike.md` (triage in design 1.5 §18). Public API check:
-`node packages/larsadmin/kit/check-public-api.mjs packages/larsadmin-medialibrary`. Remaining `SPIKE GAP`
-markers are the items deferred to 1.6: A6a (`FileTypes` / `FileResponse` internal → copied `Support\FileSafety`)
-and A4 (no per-record rights for fields → the field and the show route ask the entity's policy). The Vue side uses
+`node packages/larsadmin/kit/check-public-api.mjs packages/larsadmin-medialibrary`. Since larsadmin 1.6 (requires
+`^1.6`) the gaps deferred from 1.5 are closed: uploads and served files go through the public `Files\FileSafety` (A6a),
+and the field and the show route take the record's rights from `Field::authorizedTo()` instead of asking the policy
+(A4). The path repository pins the core at `1.x-dev` (its `dev-main` branch alias) so it resolves from any branch. The Vue side uses
 the stock kit preset and theme, `errorsByKey` for per-upload errors and `mountDisplay` in tests.

@@ -8,13 +8,12 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 use Maxcxam\Larsadmin\Fields\Field;
+use Maxcxam\Larsadmin\Files\FileSafety;
 use Maxcxam\Larsadmin\Larsadmin;
 use Maxcxam\LarsadminMedialibrary\Fields\Media;
 use Maxcxam\LarsadminMedialibrary\MedialibraryServiceProvider;
-use Maxcxam\LarsadminMedialibrary\Support\FileSafety;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media as MediaModel;
-use Symfony\Component\HttpFoundation\HeaderUtils;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 
@@ -43,23 +42,10 @@ class MediaController
 
         abort_unless($disk->exists($path), 404);
 
-        $name = $field->displayName($item);
-        $inline = ! $request->boolean('download') && FileSafety::isRasterFile($path) && FileSafety::isRasterMime($disk->mimeType($path) ?: null);
-        $ttl = max(1, (int) config('larsadmin.files.url_ttl', 30));
+        // Inline only for a raster image whose stored type is a raster type too; everything else is an attachment.
+        $download = $request->boolean('download') || ! FileSafety::isRasterImage($path, (string) $disk->mimeType($path));
 
-        return $disk->response($path, $name, [
-            'Content-Type' => $inline ? FileSafety::RASTER[strtolower(pathinfo($path, PATHINFO_EXTENSION))] : 'application/octet-stream',
-            'Content-Disposition' => HeaderUtils::makeDisposition(
-                $inline ? HeaderUtils::DISPOSITION_INLINE : HeaderUtils::DISPOSITION_ATTACHMENT,
-                $name,
-                FileSafety::asciiName($name),
-            ),
-            'X-Content-Type-Options' => 'nosniff',
-            'Content-Security-Policy' => FileSafety::CONTENT_SECURITY_POLICY,
-            'Cross-Origin-Resource-Policy' => 'same-origin',
-            'Cache-Control' => $inline ? 'private, max-age='.($ttl * 60) : 'private, no-store',
-            'Referrer-Policy' => 'no-referrer',
-        ]);
+        return FileSafety::response($disk, $path, $field->displayName($item), $download);
     }
 
     public function reorder(Request $request, string $entity, string $id, string $field): JsonResponse
@@ -133,8 +119,8 @@ class MediaController
                 continue;
             }
 
-            // SPIKE GAP (A4, deferred to 1.6): fields get no per-record rights; the form context needs "update".
-            if ($context === Field::UPDATE && ! Larsadmin::entityForKey($entity)::make($record)->authorizedToUpdate($request)) {
+            // The form context needs "update" (Field::authorizedTo() answers from the record's policy, 1.6).
+            if ($context === Field::UPDATE && ! $field->authorizedTo('update')) {
                 continue;
             }
 

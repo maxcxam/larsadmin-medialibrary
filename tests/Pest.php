@@ -38,3 +38,23 @@ function mediaIds(Article $article, string $collection): array
 {
     return $article->fresh()->getMedia($collection)->map(fn ($media) => (int) $media->getKey())->all();
 }
+
+/**
+ * The record abilities the panel computes for the current user (entity policy), for serializeField(..., $abilities).
+ *
+ * @return array{view?: bool, update?: bool, delete?: bool}
+ */
+function recordAbilities(?Article $record): array
+{
+    if ($record === null) {
+        return [];
+    }
+
+    $entity = Articles::make($record);
+
+    return [
+        'view' => $entity->authorizedToView(request()),
+        'update' => $entity->authorizedToUpdate(request()),
+        'delete' => $entity->authorizedToDelete(request()),
+    ];
+}
