@@ -1,0 +1,12 @@
+{
+  "resources/js/extension.js": {
+    "file": "extension.js",
+    "name": "extension",
+    "src": "resources/js/extension.js",
+    "isEntry": true
+  },
+  "style.css": {
+    "file": "extension.css",
+    "src": "style.css"
+  }
+}

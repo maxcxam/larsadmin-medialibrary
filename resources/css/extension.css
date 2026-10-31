@@ -1,0 +1,4 @@
+@import "tailwindcss/utilities";
+@import "larsadmin-kit/theme.css";
+
+@source "../js";

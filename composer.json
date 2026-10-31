@@ -1,0 +1,62 @@
+{
+    "name": "maxcxam/larsadmin-medialibrary",
+    "description": "spatie/laravel-medialibrary fields for larsadmin (UNRELEASED spike, the acceptance gate of the 1.5 extension API).",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Maksym Rudenko",
+            "email": "maxcxam1979@gmail.com"
+        }
+    ],
+    "repositories": [
+        {
+            "type": "path",
+            "url": "../larsadmin",
+            "options": {
+                "symlink": true,
+                "versions": {
+                    "maxcxam/larsadmin": "1.5.0"
+                }
+            }
+        }
+    ],
+    "require": {
+        "php": "^8.3",
+        "maxcxam/larsadmin": "^1.5",
+        "spatie/laravel-medialibrary": "^11.23"
+    },
+    "require-dev": {
+        "orchestra/testbench": "^10.0|^11.0",
+        "pestphp/pest": "^4.0|^5.0",
+        "pestphp/pest-plugin-laravel": "^4.0|^5.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Maxcxam\\LarsadminMedialibrary\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Maxcxam\\LarsadminMedialibrary\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Maxcxam\\LarsadminMedialibrary\\MedialibraryServiceProvider"
+            ]
+        }
+    },
+    "scripts": {
+        "test": "pest"
+    },
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}

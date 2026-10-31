@@ -1,0 +1,26 @@
+<?php
+
+return [
+    'choose' => 'Choose file',
+    'choose_multiple' => 'Add files',
+    'replace' => 'Replace',
+    'remove' => 'Remove :name',
+    'undo' => 'Undo removing :name',
+    'move_up' => 'Move :name up',
+    'move_down' => 'Move :name down',
+    'new' => 'New',
+    'none' => 'No files',
+    'removed_on_save' => ':name will be removed on save',
+    'limits' => 'Up to :size per file',
+    'types' => 'Allowed: :types',
+    'too_large' => ':name is larger than :max',
+    'type_not_allowed' => ':name has a type that is not allowed',
+    'too_many' => 'No more than :max files',
+    'download' => 'Download :name',
+    'preview_alt' => 'Preview of :name',
+    'more' => '+:count',
+    'remove_confirm' => 'Delete :name now? This cannot be undone.',
+    'removed' => ':name deleted',
+    'reordered' => 'Order saved',
+    'failed' => 'The change was not saved',
+];

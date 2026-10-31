@@ -1,0 +1,26 @@
+<?php
+
+return [
+    'choose' => 'Вибрати файл',
+    'choose_multiple' => 'Додати файли',
+    'replace' => 'Замінити',
+    'remove' => 'Вилучити :name',
+    'undo' => 'Скасувати вилучення :name',
+    'move_up' => 'Перемістити :name вище',
+    'move_down' => 'Перемістити :name нижче',
+    'new' => 'Новий',
+    'none' => 'Немає файлів',
+    'removed_on_save' => ':name буде вилучено під час збереження',
+    'limits' => 'До :size на файл',
+    'types' => 'Дозволено: :types',
+    'too_large' => ':name більший за :max',
+    'type_not_allowed' => ':name має недозволений тип',
+    'too_many' => 'Не більше :max файлів',
+    'download' => 'Завантажити :name',
+    'preview_alt' => 'Прев\'ю :name',
+    'more' => '+:count',
+    'remove_confirm' => 'Видалити :name зараз? Це не можна скасувати.',
+    'removed' => ':name видалено',
+    'reordered' => 'Порядок збережено',
+    'failed' => 'Зміну не збережено',
+];
