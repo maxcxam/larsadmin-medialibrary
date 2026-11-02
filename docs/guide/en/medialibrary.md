@@ -1,5 +1,5 @@
 # Media library: `Media` and `MediaGallery` fields
-🇺🇦 [Українська](../medialibrary.md)
+🇺🇦 [Українська](../medialibrary.md) · 🌐 [larsadmin.dev](https://larsadmin.dev/en/docs/medialibrary)
 
 The `maxcxam/larsadmin-medialibrary` add-on adds two fields for
 [spatie/laravel-medialibrary](https://spatie.be/docs/laravel-medialibrary) collections to the Larsadmin panel:

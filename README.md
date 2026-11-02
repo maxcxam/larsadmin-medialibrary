@@ -8,6 +8,8 @@
 [![Tests](https://github.com/maxcxam/larsadmin-medialibrary/actions/workflows/tests.yml/badge.svg)](https://github.com/maxcxam/larsadmin-medialibrary/actions/workflows/tests.yml)
 [![License](https://img.shields.io/packagist/l/maxcxam/larsadmin-medialibrary.svg)](LICENSE)
 
+**Website:** [larsadmin.dev](https://larsadmin.dev) · [Guide](https://larsadmin.dev/en/docs/medialibrary) · [Live demo](https://larsadmin.dev/demo)
+
 ## Features
 
 - **Two fields**: `Media` for a cover, an avatar or a contract (a new upload replaces the current file) and
@@ -112,11 +114,13 @@ The full guide, in English and Ukrainian:
 
 - [Media library guide](docs/guide/en/medialibrary.md) (English)
 - [Посібник медіатеки](docs/guide/medialibrary.md) (Українська)
+- On the website, with search: [larsadmin.dev/en/docs/medialibrary](https://larsadmin.dev/en/docs/medialibrary)
+  ([українською](https://larsadmin.dev/uk/docs/medialibrary))
 
 It covers installation, collections and conversions, both fields, disks and URLs, validation errors, image
 metadata, the file lifecycle, the audit log, security, AI assistants, testing and limitations.
 
-The core's guides: [Larsadmin documentation](https://github.com/maxcxam/larsadmin#documentation), in particular
+The core's guides: [Larsadmin documentation](https://larsadmin.dev/en/docs), in particular
 "15. Files and images" and "19. Extensions".
 
 ## AI assistants
