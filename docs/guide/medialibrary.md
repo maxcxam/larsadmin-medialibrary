@@ -1,5 +1,5 @@
 # Медіатека: поля `Media` і `MediaGallery`
-🇬🇧 [English](en/medialibrary.md)
+🇬🇧 [English](en/medialibrary.md) · 🌐 [larsadmin.dev](https://larsadmin.dev/uk/docs/medialibrary)
 
 Доповнення `maxcxam/larsadmin-medialibrary` додає в панель Larsadmin два поля для колекцій
 [spatie/laravel-medialibrary](https://spatie.be/docs/laravel-medialibrary):
